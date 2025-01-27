@@ -5,6 +5,7 @@
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Compounding Calculator</title>
+	<link rel="stylesheet" href="syles.css">
 </head>
 
 <body>
@@ -22,9 +23,29 @@
 		</div>
 
 		<div>
+			<table style="width: 100%;">
+				<thead>
+					<tr>
 
-			<h2>Result</h2>
-			<p id="result"></p>
+						<td>Periods</td>
+						<td>SIP</td>
+						<td>Initial Amount</td>
+						<td>total Gain%</td>
+						<td>Interest Amount</td>
+						<td>Net Amount</td>
+					</tr>
+				</thead>
+				<tbody id="resultTable">
+
+				</tbody>
+
+			</table>
+		</div>
+		<div>
+			<p>Net Sip Amount</p>
+			<p id="netAmount"></p>
+			<p id="totalProfit"></p>
+			<p id="netPercentage"></p>
 		</div>
 	</div>
 	<script src="script.js"></script>
