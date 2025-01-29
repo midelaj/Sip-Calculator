@@ -18,7 +18,10 @@ document.getElementById("calculate").addEventListener("click", function() {
 	if (sipRadioButton.checked) {
 		sipAmount = parseFloat(document.getElementById("sipAmount").value) || 0;
 	}
+	let totalSip = 0;
+	totalSip = sipAmount * periods;
 
+	console.log("totalSip:", totalSip);
 	let interestPercentage =
 		parseFloat(document.getElementById("interest").value) / 100;
 
@@ -59,6 +62,14 @@ document.getElementById("calculate").addEventListener("click", function() {
 		});
 
 		initialBalance = result;
+		if (i === periods) {
+			finalSummery(
+				totalSip,
+				result.toFixed(2),
+				profit.toFixed(2),
+				interestGain.toFixed(2),
+			);
+		}
 	}
 
 	function sipChange(index, newRow, table) {
@@ -115,6 +126,8 @@ document.getElementById("calculate").addEventListener("click", function() {
 			interestPercentage = parseFloat(row.cells[3].textContent / 100).toFixed(
 				2,
 			);
+
+			sipAmount = parseFloat(row.cells[1].textContent);
 			profit = parseFloat(initialBalance.toFixed(2) * interestPercentage);
 			result = parseFloat(initialBalance + profit);
 			interestGain = 100 * (profit / startingBalance);
@@ -124,7 +137,8 @@ document.getElementById("calculate").addEventListener("click", function() {
 			row.cells[4].textContent = interestGain.toFixed(2);
 			row.cells[6].textContent = result.toFixed(2);
 
-			initialBalance = result;
+			initialBalance = result + sipAmount;
+			console.log("initialBalance:", initialBalance);
 		}
 	}
 });
@@ -141,7 +155,5 @@ function finalSummery(netSip, netAmount, netProfit, netPercentageReturn) {
 	).textContent = `NET PROFIT : ${netProfit}`;
 	document.getElementById(
 		"netPercentage",
-	).textContent = `NET PERCENTAGE :${netPercentageReturn}`;
+	).textContent = `NET PERCENTAGE :${netPercentageReturn}%`;
 }
-
-//hey
