@@ -1,13 +1,13 @@
 const sipRadioButton = document.querySelector("input[name=toggleSip]");
 const sip = document.getElementById("sip");
 
-/* sipRadioButton.addEventListener("change", function() {
+sipRadioButton.addEventListener("change", function() {
 	if (this.checked) {
 		sip.classList.add("show-sip");
 	} else {
 		sip.classList.remove("show-sip");
 	}
-});*/
+});
 
 document.getElementById("calculate").addEventListener("click", function() {
 	const startingBalance = parseFloat(document.getElementById("starting").value);
@@ -15,12 +15,12 @@ document.getElementById("calculate").addEventListener("click", function() {
 	const interest = parseFloat(document.getElementById("interest").value);
 
 	let sipAmount = 0;
-	sipAmount = parseFloat(document.getElementById("sipAmount").value) || 0;
+	if (sipRadioButton.checked) {
+		sipAmount = parseFloat(document.getElementById("sipAmount").value) || 0;
+	}
 
 	let interestPercentage =
 		parseFloat(document.getElementById("interest").value) / 100;
-
-	console.log(interestPercentage);
 
 	let result;
 	let initialBalance = startingBalance;
@@ -33,7 +33,6 @@ document.getElementById("calculate").addEventListener("click", function() {
 			initialBalance += sipAmount;
 		}
 		result = initialBalance + initialBalance * interestPercentage;
-		console.log(result);
 
 		const row = document.createElement("tr");
 		profit = result.toFixed(2) - startingBalance;
@@ -42,11 +41,11 @@ document.getElementById("calculate").addEventListener("click", function() {
 		row.innerHTML = `
 			<td>${i}</td>
 			<td contenteditable="true" class = "sip">${i > 1 ? sipAmount : 0}</td>
-			<td class = "initialBalance">${initialBalance}</td>
+			<td class = "initialBalance">${initialBalance.toFixed(2)}</td>
 			<td contenteditable ="true" class = "interest">${interest}</td>
 			<td >${interestGain.toFixed(2)}</td>
 			<td>${profit.toFixed(2)}</td>
-			<td>${result}</td>
+			<td>${result.toFixed(2)}</td>
 	`;
 		resultTable.appendChild(row);
 
@@ -57,7 +56,6 @@ document.getElementById("calculate").addEventListener("click", function() {
 		const sipRow = row.querySelector(".sip");
 		sipRow.addEventListener("input", function() {
 			sipChange(i, row, resultTable);
-			console.log(`i:${i},row:${row},resultTable:${resultTable}`);
 		});
 
 		initialBalance = result;
@@ -71,21 +69,18 @@ document.getElementById("calculate").addEventListener("click", function() {
 
 		const previousRow = newRow.previousElementSibling;
 		const previousBalance = previousRow.querySelector("td:nth-child(7)");
-		console.log("pervious Balance:", previousBalance);
 		initialBalance = parseFloat(previousBalance.textContent) + sipAmount;
 
 		const interest = newRow.querySelector("td:nth-child(4)");
 		interestPercentage = parseFloat(interest.textContent / 100);
 
-		console.log(
-			`initial Balance : ${initialBalance}, sip Amount : ${sipAmount}, interest percentage : ${interestPercentage}`,
-		);
 		profit = parseFloat(initialBalance * interestPercentage);
 		result = parseFloat(initialBalance + profit);
 
 		interestGain = 100 * (profit / startingBalance);
 
-		newRow.querySelector("td:nth-child(3)").textContent = initialBalance;
+		newRow.querySelector("td:nth-child(3)").textContent =
+			initialBalance.toFixed(2);
 		newRow.querySelector("td:nth-child(7)").textContent = result.toFixed(2);
 		newRow.querySelector("td:nth-child(6)").textContent = profit.toFixed(2);
 		newRow.querySelector("td:nth-child(5)").textContent =
@@ -96,12 +91,11 @@ document.getElementById("calculate").addEventListener("click", function() {
 	function interestChange(index, newRow, table) {
 		const currentIndex = index;
 		const currentTable = table;
-		console.log({ index: currentIndex, currentRow: newRow });
 		const previousBalance = newRow.querySelector("td:nth-child(3)");
-		initialBalance = parseFloat(previousBalance.textContent);
+		initialBalance = parseFloat(previousBalance.textContent) + sipAmount;
 
 		const newInterest = newRow.querySelector("td:nth-child(4)");
-		interestPercentage = parseFloat(newInterest.textContent / 100);
+		interestPercentage = parseFloat(newInterest.textContent / 100).toFixed(2);
 
 		profit = parseFloat(initialBalance * interestPercentage);
 		result = parseFloat(initialBalance + profit);
@@ -118,8 +112,10 @@ document.getElementById("calculate").addEventListener("click", function() {
 		initialBalance = parseFloat(result.toFixed(2)) + sipAmount;
 		for (let i = currentIndex; i < periods; i++) {
 			const row = currentTable.rows[i];
-			interestPercentage = parseFloat(row.cells[3].textContent / 100);
-			profit = parseFloat(initialBalance * interestPercentage);
+			interestPercentage = parseFloat(row.cells[3].textContent / 100).toFixed(
+				2,
+			);
+			profit = parseFloat(initialBalance.toFixed(2) * interestPercentage);
 			result = parseFloat(initialBalance + profit);
 			interestGain = 100 * (profit / startingBalance);
 
@@ -128,15 +124,24 @@ document.getElementById("calculate").addEventListener("click", function() {
 			row.cells[4].textContent = interestGain.toFixed(2);
 			row.cells[6].textContent = result.toFixed(2);
 
-			console.log("row", row, {
-				initialBalance: initialBalance,
-				interest: interestPercentage,
-				profit: profit,
-				resutl: result,
-			});
 			initialBalance = result;
 		}
 	}
 });
+
+function finalSummery(netSip, netAmount, netProfit, netPercentageReturn) {
+	document.getElementById(
+		"netSipAmount",
+	).textContent = `NET SIP AMOUNT: ${netSip}`;
+	document.getElementById(
+		"netAmount",
+	).textContent = `TOTAL NET AMOUNT:${netAmount}`;
+	document.getElementById(
+		"netProfit",
+	).textContent = `NET PROFIT : ${netProfit}`;
+	document.getElementById(
+		"netPercentage",
+	).textContent = `NET PERCENTAGE :${netPercentageReturn}`;
+}
 
 //hey
