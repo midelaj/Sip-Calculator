@@ -2,43 +2,64 @@ document.getElementById("calculate").addEventListener("click", function() {
 	const startingBalance = parseFloat(document.getElementById("starting").value);
 	const periods = parseFloat(document.getElementById("periods").value);
 	const interest = parseFloat(document.getElementById("interest").value);
-	const interestPercentage =
+	let interestPercentage =
 		parseFloat(document.getElementById("interest").value) / 100;
+
+	console.log(interestPercentage);
 
 	let result;
 	let totalProfit;
-	let initailBalance = startingBalance;
+	let initialBalance = startingBalance;
 	let profit;
+	let interestGain;
+	const resultTable = document.getElementById("resultTable");
+	resultTable.innerHTML = "";
+
 	for (let i = 1; i <= periods; i++) {
-		result = initailBalance + initailBalance * interestPercentage;
+		result = initialBalance + initialBalance * interestPercentage;
 		console.log(result);
 
 		const row = document.createElement("tr");
 		profit = result.toFixed(2) - startingBalance;
-		let interestGain = 100 * (profit / startingBalance);
+		interestGain = 100 * (profit / startingBalance);
 
 		row.innerHTML = `
 			<td>${i}</td>
 			<td></td>
-			<td>${initailBalance}</td>
-			<td>${interestGain.toFixed(2)}</td>
+			<td class = "initialBalance">${initialBalance}</td>
+			<td contenteditable ="true" class = "interest">${interest}</td>
+			<td >${interestGain.toFixed(2)}</td>
 			<td>${profit.toFixed(2)}</td>
 			<td>${result}</td>
 	`;
-		document.getElementById("resultTable").appendChild(row);
-		initailBalance = result;
+		resultTable.appendChild(row);
+
+		const interestRow = row.querySelector(".interest");
+		interestRow.addEventListener("input", function() {
+			recalculate(row);
+		});
+
+		initialBalance = result;
 	}
 
-	const netPercentage = (100 * profit) / startingBalance;
-	console.log(netPercentage);
-	document.getElementById(
-		"netAmount",
-	).textContent = `Total Net Amount ${result}`;
-	document.getElementById(
-		"totalProfit",
-	).textContent = `Total Profit ${profit.toFixed(2)}`;
+	function recalculate(newRow) {
+		const currentRow = newRow;
+		console.log("row", newRow);
+		const previousBalance = newRow.querySelector("td:nth-child(3)");
+		initialBalance = parseFloat(previousBalance.textContent);
 
-	document.getElementById(
-		"netPercentage",
-	).textContent = `Net Percentage Return :${netPercentage}`;
+		const newInterest = newRow.querySelector("td:nth-child(4)");
+		interestPercentage = parseFloat(newInterest.textContent / 100);
+
+		profit = parseFloat(initialBalance * interestPercentage);
+
+		result = parseFloat(initialBalance + profit);
+
+		interestGain = 100 * (profit / startingBalance);
+		currentRow.querySelector("td:nth-child(7)").textContent = result;
+		currentRow.querySelector("td:nth-child(6)").textContent = profit;
+		currentRow.querySelector("td:nth-child(5)").textContent = interestGain;
+	}
 });
+
+//hey
