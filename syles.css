@@ -5,7 +5,7 @@ table, th,td{
 
 
 .sip-container {
-    display: none;
+    display: block;
 }
 .show-sip {
     display: block;
