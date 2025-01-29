@@ -2,3 +2,12 @@ table, th,td{
 
     border : 1px solid black;
 }
+
+
+.sip-container {
+    display: block;
+}
+.show-sip {
+    display: block;
+}
+
