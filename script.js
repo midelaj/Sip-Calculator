@@ -1,21 +1,39 @@
+const sipRadioButton = document.querySelector("input[name=toggleSip]");
+const sip = document.getElementById("sip");
+
+sipRadioButton.addEventListener("change", function() {
+	if (this.checked) {
+		sip.classList.add("show-sip");
+	} else {
+		sip.classList.remove("show-sip");
+	}
+});
+
 document.getElementById("calculate").addEventListener("click", function() {
 	const startingBalance = parseFloat(document.getElementById("starting").value);
 	const periods = parseFloat(document.getElementById("periods").value);
 	const interest = parseFloat(document.getElementById("interest").value);
+
+	let sipAmount = 0;
+	if (sipRadioButton.checked) {
+		sipAmount = parseFloat(document.getElementById("sipAmount").value);
+	}
+
 	let interestPercentage =
 		parseFloat(document.getElementById("interest").value) / 100;
 
 	console.log(interestPercentage);
 
 	let result;
-	let totalProfit;
 	let initialBalance = startingBalance;
 	let profit;
 	let interestGain;
 	const resultTable = document.getElementById("resultTable");
 	resultTable.innerHTML = "";
-
 	for (let i = 1; i <= periods; i++) {
+		if (i > 1) {
+			initialBalance += sipAmount;
+		}
 		result = initialBalance + initialBalance * interestPercentage;
 		console.log(result);
 
@@ -25,7 +43,7 @@ document.getElementById("calculate").addEventListener("click", function() {
 
 		row.innerHTML = `
 			<td>${i}</td>
-			<td></td>
+			<td>${i > 1 ? sipAmount : 0}</td>
 			<td class = "initialBalance">${initialBalance}</td>
 			<td contenteditable ="true" class = "interest">${interest}</td>
 			<td >${interestGain.toFixed(2)}</td>
