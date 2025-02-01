@@ -37,7 +37,9 @@ document.getElementById("calculate").addEventListener("click", function () {
 		if (i > 1) {
 			initialBalance += sipAmount;
 		}
-		result = initialBalance + initialBalance * interestPercentage;
+		result = parseFloat(
+			initialBalance + initialBalance * interestPercentage,
+		);
 
 		const row = document.createElement("tr");
 		profit = result.toFixed(2) - startingBalance;
@@ -45,8 +47,9 @@ document.getElementById("calculate").addEventListener("click", function () {
 
 		row.innerHTML = `
 			<td>${i}</td>
-			<td contenteditable="true" class = "sip">${i > 1 ? sipAmount : 0
-			}</td>
+			<td contenteditable="true" class = "sip">${
+			i > 1 ? sipAmount : 0
+		}</td>
 			<td class = "initialBalance">${initialBalance.toFixed(2)}</td>
 			<td contenteditable ="true" class = "interest">${interest}</td>
 			<td >${interestGain.toFixed(2)}</td>
@@ -66,10 +69,11 @@ document.getElementById("calculate").addEventListener("click", function () {
 
 		initialBalance = result;
 		if (i === periods) {
-			finalSummery(totalSip, result, profit, interestGain);
+			finalSummery(result, profit, interestGain);
 		}
 	}
 
+	//This for the sip change
 	function sipChange(index, newRow, table) {
 		const currentTable = table;
 		const currentIndex = index;
@@ -98,13 +102,15 @@ document.getElementById("calculate").addEventListener("click", function () {
 		);
 		newRow.querySelector("td:nth-child(5)").textContent = interestGain
 			.toFixed(2);
+		sumOfSip();
 		const nextRow = newRow.nextElementSibling;
 		const nextRowSip = nextRow.querySelector("td:nth-child(2)");
 		sipAmount = parseFloat(nextRowSip.textContent);
-		console.log("next sipAmount", sipAmount);
 		recalculation(currentIndex, currentTable, sipAmount);
+		finalSummery(result, profit, interestGain);
 	}
 
+	//This for the interest change:
 	function interestChange(index, newRow, table) {
 		const currentIndex = index;
 		const currentTable = table;
@@ -134,13 +140,16 @@ document.getElementById("calculate").addEventListener("click", function () {
 		newRow.querySelector("td:nth-child(5)").textContent = interestGain
 			.toFixed(2);
 
+		sumOfSip();
 		const nextRow = newRow.nextElementSibling;
 		const nextSipElement = nextRow.querySelector("td:nth-child(2)");
 		sipAmount = parseFloat(nextSipElement.textContent);
 
 		recalculation(currentIndex, currentTable, sipAmount);
+		finalSummery(result, profit, interestGain);
 	}
 
+	//This will calculate output corresponding to the changes
 	function recalculation(currentIndex, currentTable, currentSip) {
 		if (currentIndex === 1) {
 			const index = currentTable.rows[currentIndex];
@@ -166,23 +175,42 @@ document.getElementById("calculate").addEventListener("click", function () {
 			initialBalance = result + sipAmount;
 
 			if (i === periods) {
-				finalSummery(totalSip, result, profit, interestGain);
+				finalSummery(parseFloat(result), profit, interestGain);
 			}
 		}
+		sumOfSip();
 	}
 });
 
-function finalSummery(netSip, netAmount, netProfit, netPercentageReturn) {
+function sumOfSip() {
+	// Select all SIP amount cells from the second column (excluding header)
+	const sipCells = document.querySelectorAll("table tr td:nth-child(2)");
+	const startingBalance = parseFloat(
+		document.getElementById("starting").value,
+	);
+
+	// Convert NodeList to an array, extract numbers, and sum them
+	const totalSIP = Array.from(sipCells)
+		.map((td) => parseFloat(td.textContent.replace(/,/g, "")) || 0) // Convert text to number
+		.reduce((sum, amount) => sum + amount, 0) + startingBalance; // Sum all values
+
+	console.log("Total SIP Amount:", totalSIP);
+	return totalSIP;
+}
+function finalSummery(netAmount, netProfit, netPercentageReturn) {
+	const netSip = sumOfSip();
+	const totalProfit = netAmount - netSip;
+	const netProfitPercentage = (totalProfit / netSip) * 100;
 	document.getElementById(
 		"netSipAmount",
 	).textContent = `NET SIP AMOUNT: ${netSip.toFixed(2)}`;
 	document.getElementById(
 		"netAmount",
-	).textContent = `TOTAL NET AMOUNT:${netAmount.toFixed(2)}`;
+	).textContent = `TOTAL NET AMOUNT:${parseFloat(netAmount).toFixed(2)}`;
 	document.getElementById(
 		"netProfit",
-	).textContent = `NET PROFIT : ${netProfit.toFixed(2)}`;
+	).textContent = `NET PROFIT : ${totalProfit.toFixed(2)}`;
 	document.getElementById(
 		"netPercentage",
-	).textContent = `NET PERCENTAGE :${netPercentageReturn.toFixed(2)}%`;
+	).textContent = `NET PERCENTAGE :${netProfitPercentage.toFixed(2)}%`;
 }
